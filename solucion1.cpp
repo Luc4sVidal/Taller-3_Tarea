@@ -10,7 +10,7 @@ struct Vectores{
     float overhead; //porcentaje de celdas adicionales 
 };
 
-void insertar(Vectores &v, const char* nuevaPalabra){
+void insercion(Vectores &v, const char* nuevaPalabra){
     uchar** nuevoVec;
     //Redimensionar el vector una vez se haya alcanzado la capacidad maxima de claves 
     if(v.tamaño == v.capacidad_max){ 
