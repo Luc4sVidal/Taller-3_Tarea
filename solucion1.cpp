@@ -26,7 +26,6 @@ void insercion(Vectores &v, const char* nuevaPalabra){
         v.capacidad_max = nueva_cap;
     }
 
-        v.vec[i] = v.vec[i - 1];
 }
 
 int main(){
