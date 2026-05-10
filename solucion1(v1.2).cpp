@@ -79,7 +79,7 @@ bool eliminar(Vectores &v, const char* claveEliminar) {
     int clave = busquedaBinaria(v, claveEliminar);
     //si no existe
      if (clave = -1){
-        return false;
+        return false; 
      }
     delete[] v.vec[clave];
     //Hay que cerrar el espacio
