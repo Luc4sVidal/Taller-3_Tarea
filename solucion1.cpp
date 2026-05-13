@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
 using namespace std;
 typedef unsigned char uchar;
 
@@ -8,7 +9,6 @@ struct Vectores{
     int capacidad_max;
     int tam = 0; //tamaño del arreglo inicia en 0
     float overhead; //porcentaje de celdas adicionales 
-
 };
 
 int comparar(const uchar* p1, const uchar* p2){
@@ -79,7 +79,7 @@ int busquedaBinaria(Vectores &v, const char* claveBuscar) {
 bool eliminar(Vectores &v, const char* claveEliminar) {
     int clave = busquedaBinaria(v, claveEliminar);
     //si no existe
-     if (clave = -1){
+     if (clave == -1){
         return false; 
      }
     delete[] v.vec[clave];
@@ -91,17 +91,14 @@ bool eliminar(Vectores &v, const char* claveEliminar) {
     return true;
 }
 
+
 int main(int argc, char **argv){
     Vectores v;
-    cout << "Ingrese la Capacidad Maxima del vector: "<< endl;
+    cout << "Ingrese la Capacidad Maxima del vector: ";
     cin >> v.capacidad_max;
 
-    cout << "Ingrese el porcentaje de celdas adicionales: " << endl;
+    cout << "Ingrese el porcentaje de celdas adicionales: ";
     cin >> v.overhead;
-
-    
-
-    
 
     return 0;
 }
