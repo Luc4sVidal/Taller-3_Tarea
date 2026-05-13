@@ -91,6 +91,16 @@ bool eliminar(Vectores &v, const char* claveEliminar) {
     return true;
 }
 
+void ConstruirVector(Vectores &v, const string &directorio){
+    ifstream archivo(directorio);
+
+    string palabra;
+    while(archivo >> palabra){
+        insercion(v, palabra.c_str());
+    }
+
+    archivo.close();
+}
 
 int main(int argc, char **argv){
     Vectores v;
@@ -99,6 +109,17 @@ int main(int argc, char **argv){
 
     cout << "Ingrese el porcentaje de celdas adicionales: ";
     cin >> v.overhead;
+
+    v.vec = new uchar*[v.capacidad_max];
+    v.tam = 0;
+
+    ConstruirVector(v, "diccionarios/D1.txt");
+
+    for(int i = 0; i < v.tam; i++){
+        cout << v.vec[i] << " ";
+    }
+    cout << endl;
+
 
     return 0;
 }
