@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cstring>
 #include <fstream>
 using namespace std;
 typedef unsigned char uchar;
@@ -50,7 +51,9 @@ void insercion(Vectores &v, const char* nuevaPalabra){
         v.vec[i] = v.vec[i - 1];
     }
 
-    v.vec[posicion] = (uchar*)nuevaPalabra;
+    uchar* copia = new uchar[strlen(nuevaPalabra) + 1];
+    strcpy((char*)copia, nuevaPalabra);
+    v.vec[posicion] = copia;
     
     v.tam++;
 
@@ -94,12 +97,27 @@ bool eliminar(Vectores &v, const char* claveEliminar) {
 void ConstruirVector(Vectores &v, const string &directorio){
     ifstream archivo(directorio);
 
+    if(!archivo.is_open()){
+        cout << "Error: no se pudo abrir el archivo en el directorio: " << directorio << endl;
+    }
+
     string palabra;
     while(archivo >> palabra){
         insercion(v, palabra.c_str());
     }
 
     archivo.close();
+}
+
+void Imprimir(Vectores &v){
+    if(v.tam == 0){
+        cout << "Vector vacio" << endl;
+    }
+
+    for(int i = 0; i < v.tam; i++){
+        cout << v.vec[i] << " ";
+    }
+    cout << endl;
 }
 
 int main(int argc, char **argv){
@@ -113,13 +131,9 @@ int main(int argc, char **argv){
     v.vec = new uchar*[v.capacidad_max];
     v.tam = 0;
 
-    ConstruirVector(v, "diccionarios/D1.txt");
+    ConstruirVector(v, "diccionarios/dicionarios/D1.txt");
 
-    for(int i = 0; i < v.tam; i++){
-        cout << v.vec[i] << " ";
-    }
-    cout << endl;
-
+    Imprimir(v);
 
     return 0;
 }
