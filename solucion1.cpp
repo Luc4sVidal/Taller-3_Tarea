@@ -38,8 +38,35 @@ void actualizarIndices(Vectores &vl){
     }
 }
 
-void insercion(Vectores &v, const char* nuevaPalabra){
+int busquedaBinaria(Vectores &v, const char* claveBuscar) {
+    int l = v.indices[(uchar)claveBuscar[0]];
+    int r = v.tam - 1;
+    //En caso de que la letra inicial no exista en el arreglo
+    if(l == -1){ 
+        return -1;
+    }
+    while(l<=r){
+        int medio = l +(r-l)/2;
+        int res = comparar(v.vec[medio], (const uchar*)claveBuscar);
+        if (res == 0) {
+            return medio; 
+        }
+        if (res < 0) {
+            l = medio + 1;
+        }
+        else {
+            r = medio - 1;
+        }
+    }
+    return -1;
+}
+
+bool insercion(Vectores &v, const char* nuevaPalabra){
     uchar** nuevoVec;
+    //Verificar si la palabra ya existe antes de insertar
+    if(busquedaBinaria(v, nuevaPalabra) != -1){
+        return false;
+    }
     //Redimensionar el vector una vez se haya alcanzado la capacidad maxima de claves 
     if(v.tam == v.capacidad_max){ 
         int nueva_cap = v.capacidad_max + (v.capacidad_max*v.overhead);
@@ -67,38 +94,18 @@ void insercion(Vectores &v, const char* nuevaPalabra){
     uchar* copia = new uchar[strlen(nuevaPalabra) + 1];
     strcpy((char*)copia, nuevaPalabra);
     v.vec[posicion] = copia;
-    
     v.tam++;
+    actualizarIndices(v);
+
+    return true;
 
 }
 
-int busquedaBinaria(Vectores &v, const char* claveBuscar) {
-    int l = v.indices[(uchar)claveBuscar[0]];
-    int r = v.tam - 1;
-    //En caso de que la letra inicial no exista en el arreglo
-    if(l == -1){ 
-        return -1;
-    }
-    while(l<=r){
-        int medio = l +(r-l)/2;
-        int res = comparar(v.vec[medio], (const uchar*)claveBuscar);
-        if (res == 0) {
-            return medio; 
-        }
-        if (res < 0) {
-            l = medio + 1;
-        }
-        else {
-            r = medio - 1;
-        }
-    }
-    return -1;
-}
 
 bool eliminar(Vectores &v, const char* claveEliminar) {
     int clave = busquedaBinaria(v, claveEliminar);
     //si no existe
-     if (clave == -1){
+    if (clave == -1){
         return false; 
     }
     delete[] v.vec[clave];
@@ -107,6 +114,7 @@ bool eliminar(Vectores &v, const char* claveEliminar) {
         v.vec[i] = v.vec[i + 1];
     }
     v.tam--;
+    actualizarIndices(v);
     return true;
 }
 
@@ -126,19 +134,23 @@ void ConstruirVector(Vectores &v, const string &directorio){
     archivo.close();
 }
 
+long calcularMemoria(Vectores &v) {
+    long memoriaTotal = 0;
 
-void Imprimir(Vectores &v){
-    if(v.tam == 0){
-        cout << "Vector vacio" << endl;
+    // 1. Memoria de la estructura base y el arreglo de índices
+    memoriaTotal += sizeof(Vectores);
+
+    // 2. Memoria del arreglo de punteros (capacidad_max * tamaño de un puntero)
+    memoriaTotal += (v.capacidad_max * sizeof(uchar*));
+
+    // 3. Memoria de cada palabra almacenada
+    for (int i = 0; i < v.tam; i++) {
+        // strlen + 1 para contar el caracter nulo '\0'
+        memoriaTotal += (strlen((char*)v.vec[i]) + 1) * sizeof(uchar);
     }
 
-    for(int i = 0; i < v.tam; i++){
-        cout << v.vec[i] << " ";
-    }
-    cout << endl;
+    return memoriaTotal;
 }
-
-
 
 int main(int argc, char **argv){
     Vectores v;
@@ -159,19 +171,13 @@ int main(int argc, char **argv){
     clock_t t_fin = clock();
     float segundos = float(t_fin - t_inicio)/CLOCKS_PER_SEC;
     cout << "Tiempo en construir vector inicial (solo D1.txt): " << segundos <<" segundos."<< endl;
-    cout << "-------------------------------------------------"<< endl;
     
-    //Imprimir(v);
-    clock_t t_inicio_busqueda = clock();
-    int resultado = busquedaBinaria(v, "kent");
-    if(resultado != -1){
-        cout << "Palabra encontrada en la posicion: " << resultado << endl;
-    }else{
-        cout << "Palabra no encontrada." << endl;
-    }
-    clock_t t_fin_busqueda = clock();
-    float segundos_busqueda = float(t_fin_busqueda - t_inicio_busqueda)/CLOCKS_PER_SEC;
-    cout << "Tiempo en buscar una palabra de D1.txt: " << segundos_busqueda << " segundos."<< endl;
+    //calculo de memoria
+    long memoriaBytes = calcularMemoria(v);
+
+    cout << "--- RESULTADOS CONSTRUCCION (D1) ---" << endl;
+    cout << "Tiempo: " << segundos << " segundos." << endl;
+    cout << "Memoria total: " << memoriaBytes << " bytes (" << (float)memoriaBytes / 1024 << " KB)." << endl;
     cout << "-------------------------------------------------"<< endl;
 
     //Carga de D2.txt para realizar operaciones insercion y eliminacion 
@@ -182,59 +188,52 @@ int main(int argc, char **argv){
 
     vector<string> diccionario2;
     string palabra;
-    int contador = 0;
-    while(archivo >> palabra && contador <= 50000){
+    while(archivo >> palabra){
         diccionario2.push_back(palabra);
-        contador++;
     }
     archivo.close();
 
     //Desorden de D2.txt para evitar sesgos en la medicion de tiempos 
     int n = diccionario2.size();
-    srand(time(NULL));//Para que el desorden sea diferente cada que se ejecute
+
     for(int i = n - 1; i > 0; i--){
         int j = rand()%(i + 1);
         string temporal = diccionario2[i];
         diccionario2[i] = diccionario2[j];
         diccionario2[j] = temporal;
     }
-    //Insercion primeras 5000 paralabras 
-    clock_t t_inicio_insercion = clock();
-    for(int i = 0; i < diccionario2.size(); i++){
-        insercion(v, diccionario2[i].c_str());
+
+    float TiempoInsercion = 0;
+    float TiempoEliminacion = 0;
+    int InsercionExitosa = 0;
+    int EliminacionExitosa = 0;
+    int total = diccionario2.size();
+    for(int i = 0; i < total; i++){
+        //Toma intercaladamente parabras de D2
+        if(i % 2 == 0){
+            //Inserta desde el inicio y va intercalando a fin de tener |D2|/2 Inserciones
+            clock_t t_inicio_insercion = clock();
+            if(insercion(v, diccionario2[i].c_str())){
+                InsercionExitosa++;
+            }
+            clock_t t_fin_insercion = clock();
+            TiempoInsercion += float(t_fin_insercion-t_inicio_insercion)/CLOCKS_PER_SEC;
+
+        }else{
+            //Empieza a eliminar desde el final y va intercalando con el fin de tener |D2|/2 eliminaciones
+            clock_t t_inicio_eliminar = clock();
+            if(eliminar(v, diccionario2[i].c_str())){
+                EliminacionExitosa++;
+            }
+            clock_t t_fin_eliminar = clock();
+            TiempoEliminacion += float(t_fin_eliminar-t_inicio_eliminar)/CLOCKS_PER_SEC;
+        }  
     }
-    actualizarIndices(v);
-    clock_t t_fin_insercion = clock();
-    float segundos_insercion = float(t_fin_insercion - t_inicio_insercion)/CLOCKS_PER_SEC;
-    cout << "Tiempo en insertar 50000 palabras desde D2.txt: " << segundos_insercion << " segundos."<< endl;
-    cout << "-------------------------------------------------"<< endl;
 
-    clock_t t_inicio_busqueda_actualizado = clock();
-    int rep = busquedaBinaria(v, "kent");
-    if(rep != -1){
-        cout << "Palabra encontrada en la posicion: " << rep << endl;
-    }else{
-        cout << "Palabra no encontrada." << endl;
-    }
-    clock_t t_fin_busqueda_actualizado = clock();
-    float segundos_busqueda_actualizado = float(t_fin_busqueda_actualizado - t_inicio_busqueda_actualizado)/CLOCKS_PER_SEC;
-    cout << "Tiempo en buscar una palabra de D1.txt: " << segundos_busqueda_actualizado << " segundos."<< endl;
-    cout << "-------------------------------------------------"<< endl;
-
-
-    clock_t t_inicio_eliminar = clock();
-    bool resultado2 = eliminar(v, "kent");
-    if(resultado2 == true){
-        cout << "La palabra ha sido eliminada con exito."<< endl;
-    }else{
-        cout << "No se encontro la palabra"<<endl;
-    }
-    clock_t t_fin_eliminar = clock();
-    float segundos_eliminar = float(t_fin_eliminar - t_inicio_eliminar)/CLOCKS_PER_SEC;
-    cout << "Tiempo en eliminar una palabra: " << segundos_eliminar << " segundos."<< endl;
-    cout << "-------------------------------------------------"<< endl;
-
-    //Imprimir(v);
+    cout << "Tiempo de insercion: " << TiempoInsercion << " segundos." << endl;
+    cout << "Tiempo de eliminacion: " << TiempoEliminacion << " segundos." << endl;
+    cout <<"Inserciones exitosas: " << InsercionExitosa << endl;
+    cout << "Eliminaciones exitosas: "  << EliminacionExitosa << endl;
 
     for (int i = 0; i < v.tam; i++) {
         delete[] v.vec[i];
