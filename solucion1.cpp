@@ -2,6 +2,8 @@
 #include <vector>
 #include <cstring>
 #include <fstream>
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 typedef unsigned char uchar;
 
@@ -94,7 +96,7 @@ bool eliminar(Vectores &v, const char* claveEliminar) {
     return true;
 }
 
-void ConstruirVector(Vectores &v, const string &directorio){
+void ConstruirVectorInicial(Vectores &v, const string &directorio){
     ifstream archivo(directorio);
 
     if(!archivo.is_open()){
@@ -109,6 +111,9 @@ void ConstruirVector(Vectores &v, const string &directorio){
     archivo.close();
 }
 
+void CargaDesordenD2(Vectores &v, const string &directorio){
+    
+}
 void Imprimir(Vectores &v){
     if(v.tam == 0){
         cout << "Vector vacio" << endl;
@@ -119,6 +124,8 @@ void Imprimir(Vectores &v){
     }
     cout << endl;
 }
+
+
 
 int main(int argc, char **argv){
     Vectores v;
@@ -131,9 +138,10 @@ int main(int argc, char **argv){
     v.vec = new uchar*[v.capacidad_max];
     v.tam = 0;
 
-    ConstruirVector(v, "diccionarios/dicionarios/D1.txt");
-
+    ConstruirVectorInicial(v, "diccionarios/dicionarios/D1.txt");
     Imprimir(v);
+
+
 
     return 0;
 }
