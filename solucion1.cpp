@@ -163,7 +163,7 @@ int main(int argc, char **argv){
     
     //Imprimir(v);
     clock_t t_inicio_busqueda = clock();
-    int resultado = busquedaBinaria(v, "writer");
+    int resultado = busquedaBinaria(v, "kent");
     if(resultado != -1){
         cout << "Palabra encontrada en la posicion: " << resultado << endl;
     }else{
@@ -209,9 +209,21 @@ int main(int argc, char **argv){
     cout << "Tiempo en insertar 50000 palabras desde D2.txt: " << segundos_insercion << " segundos."<< endl;
     cout << "-------------------------------------------------"<< endl;
 
+    clock_t t_inicio_busqueda_actualizado = clock();
+    int rep = busquedaBinaria(v, "kent");
+    if(rep != -1){
+        cout << "Palabra encontrada en la posicion: " << rep << endl;
+    }else{
+        cout << "Palabra no encontrada." << endl;
+    }
+    clock_t t_fin_busqueda_actualizado = clock();
+    float segundos_busqueda_actualizado = float(t_fin_busqueda_actualizado - t_inicio_busqueda_actualizado)/CLOCKS_PER_SEC;
+    cout << "Tiempo en buscar una palabra de D1.txt: " << segundos_busqueda_actualizado << " segundos."<< endl;
+    cout << "-------------------------------------------------"<< endl;
+
 
     clock_t t_inicio_eliminar = clock();
-    bool resultado2 = eliminar(v, "writer");
+    bool resultado2 = eliminar(v, "kent");
     if(resultado2 == true){
         cout << "La palabra ha sido eliminada con exito."<< endl;
     }else{
