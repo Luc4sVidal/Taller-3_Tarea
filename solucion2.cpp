@@ -184,8 +184,16 @@ void insercionGrilla(nivel &g, const uchar* nuevaPalabra) {
     if (p != nullptr) {
         p->anterior = nuevo;
     }
-    
-
-
 }
-   
+
+int main() {
+    nivel g;
+    cout << "Ingrese el factor de salto K: ";
+    cin >> g.k;
+
+    g.niveles = new Nodo*[20];
+    for(int i=0; i<20; i++) g.niveles[i] = nullptr;
+    g.total = 0;
+    cout << "Grilla construida con K = " << g.k << endl;
+    return 0;
+}
