@@ -29,7 +29,6 @@ struct Nodo{
 struct nivel {
     Nodo** niveles; //arreglo de punteros para niveles[0] es L1, niveles[1] es L2, etc
     int total;   //total L de niveles
-    //int maxNivel; sugerencia
     int k;  //cuanntos nodos se agrupa
 };
 
@@ -107,41 +106,60 @@ void construir(nivel &g, Nodo* cabeza_L1) {
     
 }
 
-void eliminarEnGrilla(nivel &g, const uchar* palabra){
+void eliminarEnGrilla(nivel &g, const uchar* palabra) {
+    // 1. Buscar el nodo en el nivel base (L1)
     Nodo* p = g.niveles[0];
-    while(p && comparar(p->clave, palabra) != 0) {
+    while (p != nullptr && comparar(p->clave, palabra) != 0) {
         p = p->siguiente;
     }
+    // Si no existe la palabra, salimos
+    if (p == nullptr) return;
     Nodo* sucesor = p->siguiente;
+
+    // 2. Recorrer niveles superiores para actualizar o podar
     for (int i = 1; i < g.total; i++) {
         Nodo* q = g.niveles[i];
-        // Si el nodo de este nivel tiene la palabra que queremos borrar
-        while(q != nullptr){
-            if (comparar(q->clave,palabra) == 0){
-                if ( q != nullptr){
+        while (q != nullptr) {
+            if (comparar(q->clave, palabra) == 0) {
+                if (sucesor != nullptr) {
+                    //CASO A: Hay sucesor, reemplazamos la clave (Mantiene la estructura)
                     delete[] q->clave;
-                    // Copiamos la clave del sucesor al nodo de arriba
                     int largo = 0;
                     while (sucesor->clave[largo]) largo++;
                     q->clave = new uchar[largo + 1];
                     for (int j = 0; j <= largo; j++) {
                         q->clave[j] = sucesor->clave[j];
                     }
+                    q->abajo = sucesor; // Actualizamos la referencia vertical
+                    q = q->siguiente;   // Avanzamos normal tras el reemplazo
+                } 
+                else {
+                    //CASO B: Es el último, no hay sucesor -> Borramos el nodo de este nivel
+                    if (q == g.niveles[i]) {
+                        g.niveles[i] = q->siguiente;
+                    }
+                    if (q->anterior != nullptr) q->anterior->siguiente = q->siguiente;
+                    if (q->siguiente != nullptr) q->siguiente->anterior = q->anterior;
+                    Nodo* aux = q;
+                    q = q->siguiente; 
+                    delete[] aux->clave;
+                    delete aux;
+                    
                 }
+            } 
+            else {
+                //Si no es la palabra buscada, simplemente avanzamos
+                q = q->siguiente;
             }
-            q = q->siguiente;
         }
     }
+    //3. Eliminación física en el nivel base (L1)
     if (p == g.niveles[0]) {
         g.niveles[0] = p->siguiente;
     }
+    if (p->anterior != nullptr) p->anterior->siguiente = p->siguiente;
+    if (p->siguiente != nullptr) p->siguiente->anterior = p->anterior;
 
-    if (p->anterior != nullptr) {
-        p->anterior->siguiente = p->siguiente;
-    }
-    if (p->siguiente != nullptr) {
-        p->siguiente->anterior = p->anterior;
-    }
     delete[] p->clave;
     delete p;
 }
