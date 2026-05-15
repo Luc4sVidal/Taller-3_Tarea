@@ -1,6 +1,9 @@
 #include <iostream>
+#include <fstream>
+#include <ctime>
+#include <vector>
+#include <string>
 using namespace std;
-
 typedef unsigned char uchar;
 
 struct Nodo{
@@ -79,7 +82,7 @@ void construir(nivel &g, Nodo* cabeza_L1) {
         int contador = 0;
         int creados = 0; 
 
-// Regla de la Grilla: 1 de cada K nodos sube
+       // Regla de la Grilla: 1 de cada K nodos sube
         while (inferior != nullptr){
             if (contador % g.k == 0){
                 Nodo* nuevo = new Nodo(inferior->clave);
@@ -185,11 +188,6 @@ void insercionGrilla(nivel &g, const uchar* nuevaPalabra) {
         p->anterior = nuevo;
     }
 }
-
-#include <fstream>
-#include <ctime>
-#include <vector>
-#include <string>
 
 int main() {
     nivel g;
