@@ -186,6 +186,11 @@ void insercionGrilla(nivel &g, const uchar* nuevaPalabra) {
     }
 }
 
+#include <fstream>
+#include <ctime>
+#include <vector>
+#include <string>
+
 int main() {
     nivel g;
     cout << "Ingrese el factor de salto K: ";
@@ -193,7 +198,57 @@ int main() {
 
     g.niveles = new Nodo*[20];
     for(int i=0; i<20; i++) g.niveles[i] = nullptr;
-    g.total = 0;
-    cout << "Grilla construida con K = " << g.k << endl;
+    g.total = 1; 
+
+    ifstream archivoD1("diccionarios/D1.txt"); 
+    string palabra;
+    if (!archivoD1.is_open()) {
+        cout << "Error: No se encontro D1.txt en la carpeta 'diccionarios/'" << endl;
+        return 1;
+    }
+
+    cout << "Cargando diccionarioD1 y construyendo niveles..." << endl;
+    clock_t t_inicio_const = clock();
+    while (archivoD1 >> palabra) {
+        insercionGrilla(g, (const uchar*)palabra.c_str());
+    }
+    construir(g, g.niveles[0]); 
+    clock_t t_fin_const = clock();
+
+    cout << "Tiempo de construccion diccionario D1: " << (float)(t_fin_const - t_inicio_const)/CLOCKS_PER_SEC << "s" << endl;
+
+    ifstream archivoD2("diccionarios/D2.txt");
+    if (!archivoD2.is_open()) {
+        cout << "Error: No se encontro D2.txt" << endl;
+        return 1;
+    }
+
+    vector<string> d2_palabras;
+    while(archivoD2 >> palabra) d2_palabras.push_back(palabra);
+    
+    float t_ins = 0, t_eli = 0;
+    for(size_t i = 0; i < d2_palabras.size(); i++) {
+        clock_t t1 = clock();
+        if(i % 2 == 0) {
+            insercionGrilla(g, (const uchar*)d2_palabras[i].c_str());
+        } else {
+            eliminarEnGrilla(g, (const uchar*)d2_palabras[i].c_str());
+        }
+        clock_t t2 = clock();
+        
+        if(i % 2 == 0) t_ins += (float)(t2 - t1)/CLOCKS_PER_SEC;
+        else t_eli += (float)(t2 - t1)/CLOCKS_PER_SEC;
+    }
+
+    cout << "Tiempo Insercion total (D2): " << t_ins << "s" << endl;
+    cout << "Tiempo Eliminacion total (D2): " << t_eli << "s" << endl;
+
+    clock_t t_bus_ini = clock();
+    for(int i = 0; i < 10000 && i < (int)d2_palabras.size(); i++) {
+        buscar(g, (const uchar*)d2_palabras[i].c_str());
+    }
+    clock_t t_bus_fin = clock();
+    cout << "Tiempo promedio busqueda: " << ((float)(t_bus_fin - t_bus_ini)/CLOCKS_PER_SEC)/10000 << "s" << endl;
+
     return 0;
 }
