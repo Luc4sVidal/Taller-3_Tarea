@@ -159,6 +159,7 @@ int main(int argc, char **argv){
 
     cout << "Ingrese el porcentaje de celdas adicionales: ";
     cin >> v.overhead;
+    cout << "-------------------------------------------------"<< endl;
 
     v.vec = new uchar*[v.capacidad_max];
     v.tam = 0;
@@ -166,17 +167,15 @@ int main(int argc, char **argv){
         v.indices[i] = -1;
     }
 
-    clock_t t_inicio = clock();
+    clock_t t_inicio_contruccion = clock();
     ConstruirVector(v, "diccionarios/dicionarios/D1.txt");
-    clock_t t_fin = clock();
-    float segundos = float(t_fin - t_inicio)/CLOCKS_PER_SEC;
+    clock_t t_fin_contruccion = clock();
+    float segundos = float(t_fin_contruccion - t_inicio_contruccion)/CLOCKS_PER_SEC;
     cout << "Tiempo en construir vector inicial (solo D1.txt): " << segundos <<" segundos."<< endl;
     
     //calculo de memoria
     long memoriaBytes = calcularMemoria(v);
 
-    cout << "--- RESULTADOS CONSTRUCCION (D1) ---" << endl;
-    cout << "Tiempo: " << segundos << " segundos." << endl;
     cout << "Memoria total: " << memoriaBytes << " bytes (" << (float)memoriaBytes / 1024 << " KB)." << endl;
     cout << "-------------------------------------------------"<< endl;
 
@@ -234,9 +233,31 @@ int main(int argc, char **argv){
     cout << "Tiempo de eliminacion: " << TiempoEliminacion << " segundos." << endl;
     cout <<"Inserciones exitosas: " << InsercionExitosa << endl;
     cout << "Eliminaciones exitosas: "  << EliminacionExitosa << endl;
+    cout << "-------------------------------------------------"<< endl;
+
+    //busqueda
+    int limite;
+    int encontrados = 0;
+    if (diccionario2.size() < 10000) {
+        limite = diccionario2.size();
+    } else {
+        limite = 10000;
+    }
+    clock_t t_inicio_busqueda = clock();
+    for (int i = 0; i < limite; i++) {
+        if (busquedaBinaria(v, diccionario2[i].c_str()) != -1) {
+            encontrados++;
+        }
+    }
+    clock_t t_fin_busqueda = clock();
+    float tiempoTotal = float(t_fin_busqueda - t_inicio_busqueda) / CLOCKS_PER_SEC;
+
+    cout << "Palabras buscadas (de D2): " << limite << endl;
+    cout << "Palabras encontradas en la estructura: " << encontrados << endl;
+    cout << "Tiempo total de busqueda: " << tiempoTotal << " segundos." << endl;
 
     for (int i = 0; i < v.tam; i++) {
-        delete[] v.vec[i];
+        delete[] v.vec[i]; 
     }
     delete[] v.vec;
 
