@@ -251,10 +251,12 @@ int main(int argc, char **argv){
     }
     clock_t t_fin_busqueda = clock();
     float tiempoTotal = float(t_fin_busqueda - t_inicio_busqueda) / CLOCKS_PER_SEC;
+    float T_Promedio_busqueda = tiempoTotal/limite;
 
     cout << "Palabras buscadas (de D2): " << limite << endl;
     cout << "Palabras encontradas en la estructura: " << encontrados << endl;
     cout << "Tiempo total de busqueda: " << tiempoTotal << " segundos." << endl;
+    cout << "Tiempo promedio de la busqueda: " << T_Promedio_busqueda <<" segundos." << endl;
 
     for (int i = 0; i < v.tam; i++) {
         delete[] v.vec[i]; 
