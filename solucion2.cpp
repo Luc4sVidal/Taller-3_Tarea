@@ -110,16 +110,16 @@ void construir(nivel &g, Nodo* cabeza_L1) {
 }
 
 void eliminarEnGrilla(nivel &g, const uchar* palabra) {
-    //1. Buscar el nodo en el nivel base (L1)
+    //buscamos el nodo en el nivel base (L1)
     Nodo* p = g.niveles[0];
     while (p != nullptr && comparar(p->clave, palabra) != 0) {
         p = p->siguiente;
     }
-    //Si no existe la palabra, salimos
+    //si no existe la palabra, salimos
     if (p == nullptr) return;
     Nodo* sucesor = p->siguiente;
 
-    //2. Recorrer niveles superiores para actualizar o podar
+    //recorre los niveles superiores para actualizar o para eliminar el nodo correspondiente a la palabra
     for (int i = 1; i < g.total; i++) {
         Nodo* q = g.niveles[i];
         while (q != nullptr) {
@@ -151,12 +151,12 @@ void eliminarEnGrilla(nivel &g, const uchar* palabra) {
                 }
             } 
             else {
-                //Si no es la palabra buscada, simplemente avanzamos
+                //si no es la palabra buscada, simplemente avanzamos
                 q = q->siguiente;
             }
         }
     }
-    //3. Eliminación física en el nivel base (L1)
+    //eliminación física en el nivel base (L1)
     if (p == g.niveles[0]) {
         g.niveles[0] = p->siguiente;
     }
