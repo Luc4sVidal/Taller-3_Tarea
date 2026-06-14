@@ -264,7 +264,6 @@ int main(int argc, char **argv){
     vector<string> DesordenD1 = DesordernarDiccionarios("diccionarios/dicionarios/D1.txt");
     int REP = DesordenD1.size();
     int encontradas = 0;
-    float TiempoBusqueda = 0;
     clock_t t_inicio_busqueda = clock();
     for(int i = 0; i < REP; i++){
         int largo = DesordenD1[i].length();
