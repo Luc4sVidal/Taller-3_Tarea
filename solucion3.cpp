@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <vector>
+#include <ctime>
 using namespace std;
 BKT::BKT(int k) {
     this->k = k;
@@ -105,7 +107,6 @@ bool BKT::insert(nodoBKT** t, const uchar* palabra, int largo) {
     }
     //Clave duplicada 
     if (pos < p->numClaves && comparar(palabra, largo, p->claves[pos], largo) == 0) {
-        cout << "Clave ya existe !!" << endl;
         return false;
     }
     // si el hijo al que va a descender está lleno, lo dividimos
@@ -167,6 +168,28 @@ void ConstruirArbol(BKT &arbol, const string &directorio){
     }
     archivo.close();
 }
+
+vector<string> DesordernarDiccionarios(const string& directorio){
+    ifstream archivo(directorio);
+    vector<string> palabras;
+    string palabra;
+    while(archivo >> palabra){
+        palabras.push_back(palabra);
+    }
+    archivo.close();
+
+    //Desorden de D2.txt para evitar sesgos en la medicion de tiempos 
+    int n = palabras.size();
+
+    for(int i = n - 1; i > 0; i--){
+        int j = rand()%(i + 1);
+        string temporal = palabras[i];
+        palabras[i] = palabras[j];
+        palabras[j] = temporal;
+    }
+
+    return palabras;
+}
 //Imprime los elementos: I - R - D
 void BKT::printInorder(nodoBKT* t) {
     if (t != nullptr) {
@@ -185,11 +208,69 @@ int main(int argc, char **argv){
     int k;
     cout << "Ingrese valor de K: ";
     cin >> k;
+    cout << "-------------------------------------------------"<< endl;
 
+    //Construccion Arbol 
     BKT Arbol(k);
+    clock_t t_inicio_construccion = clock();
     ConstruirArbol(Arbol, "diccionarios/dicionarios/D1.txt");
-    Arbol.printInorder(Arbol.root);
+    clock_t t_fin_construccion = clock();
+    float segundos = float(t_fin_construccion - t_inicio_construccion)/CLOCKS_PER_SEC;
+    cout << "Tiempo en construir Arbol k+1-ario(solo D1.txt): " << segundos <<" segundos."<< endl;
+    cout << "-------------------------------------------------"<< endl;
+
+    //diccionario 2
+    vector<string>DesordenD2 = DesordernarDiccionarios("diccionarios/dicionarios/D2.txt");
+    bool insertar = true; //Para cumplir con D2/2 inserciones y D2/2 Eliminaciones, true inserta, false elimina
+    int insercionesExitosas = 0;
+    int EliminacionesExitosas = 0;
+    float TiempoInsercion = 0;
+    float TiempoEliminacion = 0;
+    for(const string& palabra : DesordenD2){
+        int largo = palabra.length();
+        if(insertar){
+            clock_t t_inicio_insercion = clock();
+            if(Arbol.insert(&Arbol.root, (const uchar*)palabra.c_str(),largo)){
+                insercionesExitosas++;
+            }
+            clock_t t_fin_insercion = clock();
+            TiempoInsercion += float(t_fin_insercion-t_inicio_insercion)/CLOCKS_PER_SEC;
+        }else{
+            clock_t t_inicio_eliminacion = clock();
+            if(Arbol.remove(&Arbol.root,(const uchar*)palabra.c_str(),largo)){
+                EliminacionesExitosas++;
+            }
+            clock_t t_fin_eliminacion = clock();
+            TiempoEliminacion += float(t_fin_eliminacion-t_inicio_eliminacion)/CLOCKS_PER_SEC;
+        }
+        insertar = !insertar;
+    }
+
+    cout << "Inserciones Existosas: " << insercionesExitosas << endl;
+    cout << "Tiempo De Insercion: " << TiempoInsercion << endl;
+    cout << "Eliminaciones Exitosas: " << EliminacionesExitosas << endl;
+    cout << "Tiempo De Eliminacion: " << TiempoEliminacion << endl;
+    cout << "-------------------------------------------------"<< endl;
+
+
+    //Busqueda claves de D1 aleatorias
+    vector<string> DesordenD1 = DesordernarDiccionarios("diccionarios/dicionarios/D1.txt");
+    int REP = DesordenD1.size();
+    int encontradas = 0;
+    float TiempoBusqueda = 0;
+    clock_t t_inicio_busqueda = clock();
+    for(int i = 0; i < REP; i++){
+        int largo = DesordenD1[i].length();
+        if(Arbol.search(Arbol.root, (const uchar*)DesordenD1[i].c_str(), largo)){
+            encontradas++;
+        }
+    }
+    clock_t t_fin_busqueda = clock();
+    cout << "Tiempo promedio busqueda: " << ((float)(t_fin_busqueda - t_inicio_busqueda)/CLOCKS_PER_SEC)/10000 << "s" << endl;
+    cout << "Palabras encontradas exitosamente: " << encontradas << endl;
+
+
 
     
-
+    return 0;
 }
