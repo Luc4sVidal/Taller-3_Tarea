@@ -198,7 +198,7 @@ int main() {
     for(int i=0; i<20; i++) g.niveles[i] = nullptr;
     g.total = 1; 
 
-    ifstream archivoD1("diccionarios/dicionarios/D1.txt"); 
+    ifstream archivoD1("diccionarios/D1.txt"); 
     string palabra;
     if (!archivoD1.is_open()) {
         cout << "Error: No se encontro D1.txt en la carpeta 'diccionarios/'" << endl;
@@ -215,7 +215,7 @@ int main() {
 
     cout << "Tiempo de construccion diccionario D1: " << (float)(t_fin_const - t_inicio_const)/CLOCKS_PER_SEC << "s" << endl;
 
-    ifstream archivoD2("diccionarios/dicionarios/D2.txt");
+    ifstream archivoD2("diccionarios/D2.txt");
     if (!archivoD2.is_open()) {
         cout << "Error: No se encontro D2.txt" << endl;
         return 1;

@@ -168,7 +168,7 @@ int main(int argc, char **argv){
     }
 
     clock_t t_inicio_contruccion = clock();
-    ConstruirVector(v, "diccionarios/dicionarios/D1.txt");
+    ConstruirVector(v, "diccionarios/D1.txt");
     clock_t t_fin_contruccion = clock();
     float segundos = float(t_fin_contruccion - t_inicio_contruccion)/CLOCKS_PER_SEC;
     cout << "Tiempo en construir vector inicial (solo D1.txt): " << segundos <<" segundos."<< endl;
@@ -180,7 +180,7 @@ int main(int argc, char **argv){
     cout << "-------------------------------------------------"<< endl;
 
     //Carga de D2.txt para realizar operaciones insercion y eliminacion 
-    ifstream archivo("diccionarios/dicionarios/D2.txt");
+    ifstream archivo("diccionarios/D2.txt");
     if(!archivo.is_open()){
         cout << "Error: No se pudo abrir el archivo" << endl;
     }

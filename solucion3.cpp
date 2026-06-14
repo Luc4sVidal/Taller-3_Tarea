@@ -218,7 +218,7 @@ int main(int argc, char **argv){
     //Construccion Arbol 
     BKT Arbol(k);
     clock_t t_inicio_construccion = clock();
-    ConstruirArbol(Arbol, "diccionarios/dicionarios/D1.txt");
+    ConstruirArbol(Arbol, "diccionarios/D1.txt");
     clock_t t_fin_construccion = clock();
     float segundos = float(t_fin_construccion - t_inicio_construccion)/CLOCKS_PER_SEC;
     cout << "Tiempo en construir Arbol k+1-ario(solo D1.txt): " << segundos <<" segundos."<< endl;
@@ -227,7 +227,7 @@ int main(int argc, char **argv){
     cout << "-------------------------------------------------"<< endl;
 
     //diccionario 2
-    vector<string>DesordenD2 = DesordernarDiccionarios("diccionarios/dicionarios/D2.txt");
+    vector<string>DesordenD2 = DesordernarDiccionarios("diccionarios/D2.txt");
     bool insertar = true; //Para cumplir con D2/2 inserciones y D2/2 Eliminaciones, true inserta, false elimina
     int insercionesExitosas = 0;
     int EliminacionesExitosas = 0;
@@ -261,7 +261,7 @@ int main(int argc, char **argv){
 
 
     //Busqueda claves de D1 aleatorias
-    vector<string> DesordenD1 = DesordernarDiccionarios("diccionarios/dicionarios/D1.txt");
+    vector<string> DesordenD1 = DesordernarDiccionarios("diccionarios/D1.txt");
     int REP = DesordenD1.size();
     int encontradas = 0;
     clock_t t_inicio_busqueda = clock();
