@@ -25,6 +25,7 @@ class BKT {
 public:
     nodoBKT* root;
     int k; 
+    long long memoriaUsadaBytes = 0;
     BKT(int k);
     void eliminarNodos(nodoBKT* t);
     virtual ~BKT();
@@ -34,5 +35,6 @@ public:
     void dividirHijo(nodoBKT* padre, int pos);
     int comparar(const uchar* s1, int l1, const uchar* s2, int l2);
     void printInorder(nodoBKT *t);
+    void ConstruirArbol(BKT &arbol, const string &directorio);
 };
 #endif

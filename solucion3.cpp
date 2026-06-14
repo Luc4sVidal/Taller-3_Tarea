@@ -84,6 +84,10 @@ bool BKT::insert(nodoBKT** t, const uchar* palabra, int largo) {
     // si el Árbol esta vacío
     if (*t == nullptr) {
         *t = new nodoBKT(k);
+        memoriaUsadaBytes += sizeof(nodoBKT);
+        memoriaUsadaBytes += (k * sizeof(uchar*));       // Arreglo de claves
+        memoriaUsadaBytes += ((k + 1) * sizeof(nodoBKT*)); // Arreglo de hijos
+        memoriaUsadaBytes += (largo + 1) * sizeof(uchar);
         (*t)->claves[0] = new uchar[largo + 1];
         for (int i = 0; i < largo; i++) {
             (*t)->claves[0][i] = palabra[i];
@@ -95,6 +99,7 @@ bool BKT::insert(nodoBKT** t, const uchar* palabra, int largo) {
     //El nodo raíz está lleno
     if ((*t) == root && root->numClaves == k) {
         nodoBKT* nuevaRaiz = new nodoBKT(k);
+        memoriaUsadaBytes += sizeof(nodoBKT) + (k * sizeof(uchar*)) + ((k + 1) * sizeof(nodoBKT*));
         nuevaRaiz->hijos[0] = root;
         dividirHijo(nuevaRaiz, 0);
         root = nuevaRaiz;
@@ -217,6 +222,8 @@ int main(int argc, char **argv){
     clock_t t_fin_construccion = clock();
     float segundos = float(t_fin_construccion - t_inicio_construccion)/CLOCKS_PER_SEC;
     cout << "Tiempo en construir Arbol k+1-ario(solo D1.txt): " << segundos <<" segundos."<< endl;
+    float MemoriaUsada = Arbol.memoriaUsadaBytes/1024.0;
+    cout << "Memoria Total: " << MemoriaUsada << " bytes" << endl;
     cout << "-------------------------------------------------"<< endl;
 
     //diccionario 2
@@ -266,8 +273,8 @@ int main(int argc, char **argv){
         }
     }
     clock_t t_fin_busqueda = clock();
+    cout << "Palabras encontradas exitosamente (de D1.txt): " << encontradas << endl;
     cout << "Tiempo promedio busqueda: " << ((float)(t_fin_busqueda - t_inicio_busqueda)/CLOCKS_PER_SEC)/10000 << "s" << endl;
-    cout << "Palabras encontradas exitosamente: " << encontradas << endl;
 
 
 
