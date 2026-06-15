@@ -105,8 +105,20 @@ void construir(nivel &g, Nodo* cabeza_L1) {
         cantNodos = creados;
     } 
     g.total = nivel + 1;  
-    
-    
+}
+
+void limpiarNiveles(nivel &g) {
+    for (int i = 1; i < g.total; i++) {
+        Nodo* q = g.niveles[i];
+        while (q != nullptr) {
+            Nodo* aux = q;
+            q = q->siguiente;
+            delete[] aux->clave;
+            delete aux;
+        }
+        g.niveles[i] = nullptr;
+    }
+    g.total = 1;
 }
 
 void eliminarEnGrilla(nivel &g, const uchar* palabra) {
@@ -117,45 +129,7 @@ void eliminarEnGrilla(nivel &g, const uchar* palabra) {
     }
     //si no existe la palabra, salimos
     if (p == nullptr) return;
-    Nodo* sucesor = p->siguiente;
 
-    //recorre los niveles superiores para actualizar o para eliminar el nodo correspondiente a la palabra
-    for (int i = 1; i < g.total; i++) {
-        Nodo* q = g.niveles[i];
-        while (q != nullptr) {
-            if (comparar(q->clave, palabra) == 0) {
-                if (sucesor != nullptr) {
-                    //CASO A: Hay sucesor, reemplazamos la clave (Mantiene la estructura)
-                    delete[] q->clave;
-                    int largo = 0;
-                    while (sucesor->clave[largo]) largo++;
-                    q->clave = new uchar[largo + 1];
-                    for (int j = 0; j <= largo; j++) {
-                        q->clave[j] = sucesor->clave[j];
-                    }
-                    q->abajo = sucesor; // Actualizamos la referencia vertical
-                    q = q->siguiente;   // Avanzamos normal tras el reemplazo
-                } 
-                else {
-                    //CASO B: Es el último, no hay sucesor -> Borramos el nodo de este nivel
-                    if (q == g.niveles[i]) {
-                        g.niveles[i] = q->siguiente;
-                    }
-                    if (q->anterior != nullptr) q->anterior->siguiente = q->siguiente;
-                    if (q->siguiente != nullptr) q->siguiente->anterior = q->anterior;
-                    Nodo* aux = q;
-                    q = q->siguiente; 
-                    delete[] aux->clave;
-                    delete aux;
-                    
-                }
-            } 
-            else {
-                //si no es la palabra buscada, simplemente avanzamos
-                q = q->siguiente;
-            }
-        }
-    }
     //eliminación física en el nivel base (L1)
     if (p == g.niveles[0]) {
         g.niveles[0] = p->siguiente;
@@ -165,6 +139,9 @@ void eliminarEnGrilla(nivel &g, const uchar* palabra) {
 
     delete[] p->clave;
     delete p;
+
+    limpiarNiveles(g);
+    construir(g, g.niveles[0]);
 }
 
 void insercionGrilla(nivel &g, const uchar* nuevaPalabra) {
@@ -187,6 +164,9 @@ void insercionGrilla(nivel &g, const uchar* nuevaPalabra) {
     if (p != nullptr) {
         p->anterior = nuevo;
     }
+
+    limpiarNiveles(g);
+    construir(g, g.niveles[0]);
 }
 
 int main() {
@@ -208,7 +188,20 @@ int main() {
     cout << "Cargando diccionarioD1 y construyendo niveles..." << endl;
     clock_t t_inicio_const = clock();
     while (archivoD1 >> palabra) {
-        insercionGrilla(g, (const uchar*)palabra.c_str());
+        Nodo* p_act = g.niveles[0];
+        Nodo* ant_act = nullptr;
+        while (p_act != nullptr && comparar(p_act->clave, (const uchar*)palabra.c_str()) < 0) {
+            ant_act = p_act;
+            p_act = p_act->siguiente;
+        }
+        if (p_act != nullptr && comparar(p_act->clave, (const uchar*)palabra.c_str()) == 0) continue;
+        
+        Nodo* nuevo = new Nodo((const uchar*)palabra.c_str());
+        nuevo->siguiente = p_act;
+        nuevo->anterior = ant_act;
+        if (ant_act == nullptr) g.niveles[0] = nuevo;
+        else ant_act->siguiente = nuevo;
+        if (p_act != nullptr) p_act->anterior = nuevo;
     }
     construir(g, g.niveles[0]); 
     clock_t t_fin_const = clock();
